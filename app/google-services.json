@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1020779751325",
+    "firebase_url": "https://gps-pj-db.firebaseio.com",
+    "project_id": "gps-pj-db",
+    "storage_bucket": "gps-pj-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020779751325:android:eca0f165a43c4ac0f13174",
+        "android_client_info": {
+          "package_name": "com.example.gps_pj"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020779751325-pab1a3jmgahasrrc8fopvqbfhk0q576a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gps_pj",
+            "certificate_hash": "35272e06d2ab6a180c2fc76526dbf61239a59c25"
+          }
+        },
+        {
+          "client_id": "1020779751325-256f3upppn95200q75dqcu6goq8hkbjh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDly8mWS802bz3_puoESI7bLR-FW7PUr4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020779751325-256f3upppn95200q75dqcu6goq8hkbjh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
