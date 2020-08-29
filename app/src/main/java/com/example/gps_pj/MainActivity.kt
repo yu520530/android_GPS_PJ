@@ -44,5 +44,9 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        btn_signUp.setOnClickListener {
+
+        }
+
     }
 }
