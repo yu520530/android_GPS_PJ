@@ -3,28 +3,23 @@ package com.example.gps_pj
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Location
-import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.core.app.ActivityCompat
-
 import android.location.LocationListener
-import android.os.Build
+import android.location.LocationManager
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.core.graphics.createBitmap
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.pow
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -32,6 +27,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var orilocation : Location? = null
     val TAG = "MapsActivity"
     private  val REQUEST_PERMISSIONS = 1
+    val rectOptions: PolylineOptions = PolylineOptions()
+    var bf:Location? = null
+    var tot:Double = 0.0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,12 +65,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
 
     }
+
     //標記位置
     fun  drawMarker()
     {
+
+
         var lntLng = LatLng(orilocation!!.latitude, orilocation!!.longitude)
+        if(bf != null){
+            tot = tot + distance(LatLng(bf!!.latitude, bf!!.longitude),lntLng)
+            Toast.makeText(this, "總共移動 %s 公尺".format(tot.toString()), Toast.LENGTH_LONG).show()
+
+        }
+
+        bf = orilocation
         mMap.addMarker(MarkerOptions().position(lntLng).title(getNowTimeDetail()).icon(BitmapDescriptorFactory.fromResource(R.drawable.gps_marker)))
-        Toast.makeText(this, "改變位置", Toast.LENGTH_LONG).show()
+        rectOptions.add(lntLng)
+        mMap.addPolyline(rectOptions)
+        //Toast.makeText(this, "改變位置", Toast.LENGTH_LONG).show()
     }
 
 
@@ -96,6 +107,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 else if(isNETWORKEnable)
                 {
+                    //5000 10
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,5000L,10f,locationListener)
                     orilocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
@@ -130,6 +142,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     fun getNowTimeDetail(): String? {
         val sdf = SimpleDateFormat("HH時mm分ss秒")
         return sdf.format(Date())
+    }
+    //取得距離
+    fun distance(a:LatLng,b:LatLng): Double
+    {
+        var ans  = (((a.latitude - b.latitude)*110.574).pow(2) + ((a.longitude - b.longitude)*111.320).pow(2)).pow(0.5)
+        return ans
+
     }
     //同意使用再app上使用gps
     override fun onRequestPermissionsResult(

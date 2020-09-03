@@ -31,22 +31,30 @@ class MainActivity : AppCompatActivity() {
             val email = ed_email.text.toString()
             val psd = ed_psd.text.toString()
             //帳號驗證
-            auth.signInWithEmailAndPassword(email,psd)
-                .addOnCompleteListener(this) {task ->
-                    if(task.isSuccessful)
-                    {
-                        Log.d(TAG,"login success")
-                        val intent = Intent(this,MapsActivity::class.java)
-                        Toast.makeText(this,"login success",Toast.LENGTH_SHORT).show()
-                        startActivity(intent)
-                    }
-                    else
-                    {
-                        Log.w(TAG,"login unsuccess",task.exception)
-                        Toast.makeText(this,"please check your email and password",Toast.LENGTH_SHORT).show()
+            if(email ==""||psd=="")
+            {
+                Toast.makeText(this, "帳號或密碼空白",
+                    Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                auth.signInWithEmailAndPassword(email,psd)
+                    .addOnCompleteListener(this) {task ->
+                        if(task.isSuccessful)
+                        {
+                            Log.d(TAG,"login success")
+                            val intent = Intent(this,MapsActivity::class.java)
+                            Toast.makeText(this,"login success",Toast.LENGTH_SHORT).show()
+                            startActivity(intent)
+                        }
+                        else
+                        {
+                            Log.w(TAG,"login unsuccess",task.exception)
+                            Toast.makeText(this,"please check your email and password",Toast.LENGTH_SHORT).show()
 
+                        }
                     }
-                }
+            }
 
         }
 
@@ -62,30 +70,39 @@ class MainActivity : AppCompatActivity() {
            val created_psd = ed_create_psd.text.toString()
            val created_check_psd = ed_create_check_psd.text.toString()
            //確認密碼一致性
-           if(created_psd == created_check_psd)
+           if(created_email ==""||created_psd==""||created_check_psd=="")
            {
-               auth.createUserWithEmailAndPassword(created_email, created_psd)
-                   .addOnCompleteListener(this) { task ->
-                       if (task.isSuccessful) {
-                           // Sign in success, update UI with the signed-in user's information
-                           Log.d(TAG, "createUserWithEmail:success")
-                           Toast.makeText(this, "Authentication success.",
-                               Toast.LENGTH_SHORT).show()
-
-                       } else {
-                           Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                           Toast.makeText(this, "Authentica tion failed.",
-                               Toast.LENGTH_SHORT).show()
-                       }
-                   }
+               Toast.makeText(this, "帳號或密碼或確認密碼空白",
+                   Toast.LENGTH_SHORT).show()
            }
            else
            {
-               Log.w(TAG, "psd is not equal")
-               Toast.makeText(this, "psd not equal",
-                   Toast.LENGTH_SHORT).show()
-           }
+               if(created_psd == created_check_psd)
+               {
+                   auth.createUserWithEmailAndPassword(created_email, created_psd)
+                       .addOnCompleteListener(this) { task ->
+                           if (task.isSuccessful) {
+                               // Sign in success, update UI with the signed-in user's information
+                               Log.d(TAG, "createUserWithEmail:success")
+                               Toast.makeText(this, "Authentication success.",
+                                   Toast.LENGTH_SHORT).show()
+                               cl_signUp.visibility = View.GONE
+                               cl_login.visibility = View.VISIBLE
 
+                           } else {
+                               Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                               Toast.makeText(this, "Authentica tion failed.",
+                                   Toast.LENGTH_SHORT).show()
+                           }
+                       }
+               }
+               else
+               {
+                   Log.w(TAG, "psd is not equal")
+                   Toast.makeText(this, "psd not equal",
+                       Toast.LENGTH_SHORT).show()
+               }
+           }
        }
 
         //取消創建帳號
