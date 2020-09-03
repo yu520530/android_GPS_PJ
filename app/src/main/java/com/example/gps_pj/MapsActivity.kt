@@ -1,8 +1,17 @@
 package com.example.gps_pj
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 
+import android.location.LocationListener
+import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -13,7 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-
+    var orilocation : Location? = null
+    val TAG = "MapsActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -23,21 +33,80 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        locationManager()
+        //顯示裝置的位子 小藍點
+        mMap.isMyLocationEnabled = true
+
+    }
+    //標記位置
+    fun  drawMarker()
+    {
+        var lntLng = LatLng(orilocation!!.latitude, orilocation!!.longitude)
+        mMap.addMarker(MarkerOptions().position(lntLng).title("I'm here!"))
+        Toast.makeText(this, "改變位置", Toast.LENGTH_LONG).show()
+    }
+
+    private fun locationManager()
+    {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        var isNETWORKEnable = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        var isGPSEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if(!(isNETWORKEnable || isGPSEnable))
+        {
+            Toast.makeText(this, "並未開啟任何定位服務", Toast.LENGTH_SHORT).show()
+        }
+        else
+        {
+            try {
+                if(isGPSEnable)
+                {
+                    //註冊 LocationManager 要向哪個服務取得位置更新資訊
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000L,20f,locationListener)
+                    //取得上一次的定位
+                    orilocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                }
+                else if(isNETWORKEnable)
+                {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,5000L,20f,locationListener)
+                    orilocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                }
+            } catch (ex:SecurityException)
+            {
+                Log.d(TAG,ex.message.toString())
+            }
+            if(orilocation != null) {
+                drawMarker()
+            }
+        }
+    }
+    //listener locationChange
+    private val locationListener: LocationListener = object : LocationListener
+    {
+        override fun onLocationChanged(location: Location) {
+            if(orilocation == null)
+            {
+                orilocation = location
+                drawMarker()
+            }
+            else
+            {
+                orilocation = location
+                drawMarker()
+            }
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 12.0f))
+        }
     }
 }
