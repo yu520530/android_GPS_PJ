@@ -101,14 +101,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if(isGPSEnable)
                 {
                     //註冊 LocationManager 要向哪個服務取得位置更新資訊
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000L,10f,locationListener)
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000L,30f,locationListener)
                     //取得上一次的定位
                     orilocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 }
                 else if(isNETWORKEnable)
                 {
                     //5000 10
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,5000L,10f,locationListener)
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,5000L,30f,locationListener)
                     orilocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
             } catch (ex:SecurityException)
