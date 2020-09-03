@@ -3,6 +3,8 @@ package com.example.gps_pj
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
@@ -13,10 +15,12 @@ import android.location.LocationListener
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.core.graphics.createBitmap
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import java.text.SimpleDateFormat
@@ -66,7 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     fun  drawMarker()
     {
         var lntLng = LatLng(orilocation!!.latitude, orilocation!!.longitude)
-        mMap.addMarker(MarkerOptions().position(lntLng).title(getNowTimeDetail()))
+        mMap.addMarker(MarkerOptions().position(lntLng).title(getNowTimeDetail()).icon(BitmapDescriptorFactory.fromResource(R.drawable.gps_marker)))
         Toast.makeText(this, "改變位置", Toast.LENGTH_LONG).show()
     }
 
