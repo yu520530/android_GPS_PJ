@@ -3,12 +3,12 @@ package com.example.gps_pj
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,6 +17,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -30,19 +35,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     val rectOptions: PolylineOptions = PolylineOptions()
     var bf:Location? = null
     var tot:Double = 0.0
-
+    var username:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS)
         else{
             val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
         }
-
+        intent?.extras?.let {
+            val ac = it.getString("ac")
+            username = ac!!.replace("@gmail.com","")
+            username = ac.replace("@gm.nfu.edu.tw","")
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
     }
@@ -73,7 +82,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var lntLng = LatLng(orilocation!!.latitude, orilocation!!.longitude)
         if(bf != null){
-            tot = tot + distance(LatLng(bf!!.latitude, bf!!.longitude),lntLng)
+            tot += distance(LatLng(bf!!.latitude, bf!!.longitude), lntLng)
             Toast.makeText(this, "總共移動 %s 公尺".format(tot.toString()), Toast.LENGTH_LONG).show()
 
         }
@@ -149,6 +158,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var ans  = (((a.latitude - b.latitude)*110.574).pow(2) + ((a.longitude - b.longitude)*111.320).pow(2)).pow(0.5)
         return ans
 
+    }
+    //當捕捉到返回鍵
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Toast.makeText(this, "儲存資料", Toast.LENGTH_SHORT).show()
+            dbprocess()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+   fun dbquery()
+   {
+       
+
+   }
+    //處理db
+    fun dbprocess()
+    {
+            var map = mutableMapOf<String,Any>()
+            map["distance"] = tot
+            FirebaseDatabase.getInstance().reference
+                .child("users")
+                .child(username)
+                .setValue(map)
     }
     //同意使用再app上使用gps
     override fun onRequestPermissionsResult(

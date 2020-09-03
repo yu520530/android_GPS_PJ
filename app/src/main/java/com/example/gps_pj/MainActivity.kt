@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity() {
                         if(task.isSuccessful)
                         {
                             Log.d(TAG,"login success")
-                            val intent = Intent(this,MapsActivity::class.java)
                             Toast.makeText(this,"login success",Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this,MapsActivity::class.java)
+                            intent.putExtra("ac",email)
                             startActivity(intent)
                         }
                         else
